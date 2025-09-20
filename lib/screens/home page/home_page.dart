@@ -2,6 +2,7 @@ import 'package:db_with_provider_usin_mvvm/controllers/database_controller.dart'
 import 'package:db_with_provider_usin_mvvm/controllers/pick_img_controller.dart';
 import 'package:db_with_provider_usin_mvvm/screens/home%20page/widgets/home_data_widget.dart';
 import 'package:db_with_provider_usin_mvvm/utils/custom_snack_bar.dart';
+import 'package:db_with_provider_usin_mvvm/utils/dialogs/loading_dialog_box.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hawk_fab_menu/hawk_fab_menu.dart';
@@ -20,13 +21,22 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      context.read<DatabaseController>().getImages();
-    });
+    getData();
   }
+
+void getData()async{
+  WidgetsBinding.instance.addPostFrameCallback((timeStamp) async{
+      loadingDialogBox(context, 'loading...');
+      
+       await  context.read<DatabaseController>().getImages();
+      
+      Navigator.pop(context);
+    });
+}
 
   @override
   Widget build(BuildContext context) {
+    print('Home page build called');
     return Material(
       child: HawkFabMenu(
         blur: 0.5,
@@ -50,7 +60,23 @@ if (value.isLoading) {
 }
 
                     return Consumer<DatabaseController>(
+
                       builder: (context, value, _) {
+
+//                         if (value.showDialog=='loading') {
+//   WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+   
+//       loadingDialogBox(context, 'Data loading...');
+    
+    
+//   },);
+ 
+// }
+// if (value.showDialog=='loaded') {
+//        WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+//    Navigator.pop(context);
+//   },);
+//     }
                         var isError = value.isError;
                         var isLoading = value.isLoading;
                         var error = value.error;

@@ -1,20 +1,67 @@
+import 'dart:developer';
+import 'package:db_with_provider_usin_mvvm/controllers/database_controller.dart';
 import 'package:db_with_provider_usin_mvvm/models/gallery_model.dart';
 import 'package:db_with_provider_usin_mvvm/screens/home%20page/widgets/home_card_widget.dart';
+import 'package:db_with_provider_usin_mvvm/utils/custom_snack_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class HomeDataWidget extends StatelessWidget {
-  const HomeDataWidget({super.key, required this.list});
+class HomeDataWidget extends StatefulWidget {
+  const HomeDataWidget({super.key, required this.list, });
   final List<GalleryModel> list;
-  
+
   @override
-  Widget build(BuildContext context) {
+  State<HomeDataWidget> createState() => _HomeDataWidgetState();
+}
+
+class _HomeDataWidgetState extends State<HomeDataWidget> {
+
+ScaffoldMessengerState? scaffoldMessengerState;
+
+
+@override
+  void initState() {
+    super.initState();
+    log('Init called');
+  
+  }
+
+@override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    log('did dependency called');
+    scaffoldMessengerState= ScaffoldMessenger.of(context);
+    
+    
+  }
+
+@override
+  void dispose() {
+    log('dispose called');
+    scaffoldMessengerState?.clearSnackBars();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext contextX) {
+    log('BUILD CALLED');
     return SliverGrid.builder(
-      itemCount: list.length,
+      itemCount: widget.list.length,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
       ),
       itemBuilder: (context, index) {
-        return HomeCardWidget(path: list[index].imgPath ?? '');
+        return GestureDetector(
+          onLongPress: () async{
+           var isDeleted= await contextX.read<DatabaseController>().deleteImage(widget.list[index]);
+           if (isDeleted) {
+            // snackbarWithStateKey( 'Item deleted successfully');
+            snackbarState(scaffoldMessengerState!, 'Item added successfuly');
+           }else{
+            
+           }
+          },
+          child: HomeCardWidget(path: widget.list[index].imgPath ?? ''));
       },
     );
   }

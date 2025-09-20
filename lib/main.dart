@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
+
+GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey=GlobalKey<ScaffoldMessengerState>();
 void main(){
   runApp(MultiProvider(
     providers: [
@@ -27,6 +29,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      
+      scaffoldMessengerKey: scaffoldMessengerKey,
       initialRoute: IntroPage.pageName,
       debugShowCheckedModeBanner: false,
 onGenerateRoute: onGenerateRoute,
