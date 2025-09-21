@@ -3,6 +3,7 @@ import 'package:db_with_provider_usin_mvvm/controllers/database_controller.dart'
 import 'package:db_with_provider_usin_mvvm/models/gallery_model.dart';
 import 'package:db_with_provider_usin_mvvm/screens/home%20page/widgets/home_card_widget.dart';
 import 'package:db_with_provider_usin_mvvm/utils/custom_snack_bar.dart';
+import 'package:db_with_provider_usin_mvvm/utils/dialogs/loading_dialog_box.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -17,7 +18,7 @@ class HomeDataWidget extends StatefulWidget {
 class _HomeDataWidgetState extends State<HomeDataWidget> {
 
 ScaffoldMessengerState? scaffoldMessengerState;
-
+NavigatorState? navigatorState;
 
 @override
   void initState() {
@@ -31,14 +32,14 @@ ScaffoldMessengerState? scaffoldMessengerState;
     super.didChangeDependencies();
     log('did dependency called');
     scaffoldMessengerState= ScaffoldMessenger.of(context);
-    
+    navigatorState=Navigator.of(context);
     
   }
 
 @override
   void dispose() {
     log('dispose called');
-    scaffoldMessengerState?.clearSnackBars();
+    // scaffoldMessengerState?.clearSnackBars();
     super.dispose();
   }
 
@@ -53,12 +54,16 @@ ScaffoldMessengerState? scaffoldMessengerState;
       itemBuilder: (context, index) {
         return GestureDetector(
           onLongPress: () async{
+            loadingDialogBox(context, 'Deleting...');
            var isDeleted= await contextX.read<DatabaseController>().deleteImage(widget.list[index]);
+           navigatorState?.pop();
            if (isDeleted) {
-            // snackbarWithStateKey( 'Item deleted successfully');
-            snackbarState(scaffoldMessengerState!, 'Item added successfuly');
-           }else{
             
+            snackbarState(scaffoldMessengerState!, 'Item added successfuly');
+
+           }else{
+
+            snackbar(context, 'Failed to add');
            }
           },
           child: HomeCardWidget(path: widget.list[index].imgPath ?? ''));

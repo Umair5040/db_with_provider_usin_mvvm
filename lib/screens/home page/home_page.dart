@@ -1,4 +1,5 @@
 import 'package:db_with_provider_usin_mvvm/controllers/database_controller.dart';
+import 'package:db_with_provider_usin_mvvm/controllers/loaction_controller.dart';
 import 'package:db_with_provider_usin_mvvm/controllers/pick_img_controller.dart';
 import 'package:db_with_provider_usin_mvvm/screens/home%20page/widgets/home_data_widget.dart';
 import 'package:db_with_provider_usin_mvvm/utils/custom_snack_bar.dart';
@@ -24,15 +25,15 @@ class _HomePageState extends State<HomePage> {
     getData();
   }
 
-void getData()async{
-  WidgetsBinding.instance.addPostFrameCallback((timeStamp) async{
+  void getData() async {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       loadingDialogBox(context, 'loading...');
-      
-       await  context.read<DatabaseController>().getImages();
-      
+
+      await context.read<DatabaseController>().getImages();
+
       Navigator.pop(context);
     });
-}
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,41 +50,58 @@ void getData()async{
             child: CustomScrollView(
               physics: const BouncingScrollPhysics(),
               slivers: [
-                const SliverAppBar(toolbarHeight: 5),
+                SliverAppBar(
+                  title: Consumer<LocationController>(
+                    builder: (context, value, _) {
+                      // if (value.isError) {
+                      //   String error= value.error;
+                      //   snackbar(context, error, color: Colors.red);
+                      // }else{
+                      //   snackbar(context, 'Permission allowed');
+                      // }
+                      return GestureDetector(
+                        onTap: () async {
+                          // loadingDialogBox(context, 'loading location...');
+                          await context
+                              .read<LocationController>()
+                              .getLocation();
+                        },
+                        child: Text(
+                          value.placemark?.locality ?? 'Location denied',
+                        ),
+                      );
+                    },
+                  ),
+                  centerTitle: true,
+                ),
                 Consumer<PickImgController>(
                   builder: (context, value, _) {
-
-if (value.isLoading) {
-  WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-    snackbar(context, 'Updated successfully');
-  },);
-}
+                    if (value.isLoading) {
+                      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+                        snackbar(context, 'Updated successfully');
+                      });
+                    }
 
                     return Consumer<DatabaseController>(
-
                       builder: (context, value, _) {
+                        //                         if (value.showDialog=='loading') {
+                        //   WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
 
-//                         if (value.showDialog=='loading') {
-//   WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-   
-//       loadingDialogBox(context, 'Data loading...');
-    
-    
-//   },);
- 
-// }
-// if (value.showDialog=='loaded') {
-//        WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-//    Navigator.pop(context);
-//   },);
-//     }
+                        //       loadingDialogBox(context, 'Data loading...');
+
+                        //   },);
+
+                        // }
+                        // if (value.showDialog=='loaded') {
+                        //        WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+                        //    Navigator.pop(context);
+                        //   },);
+                        //     }
                         var isError = value.isError;
                         var isLoading = value.isLoading;
                         var error = value.error;
                         var list = value.galleryModelList;
-                    
-                    
-                    
+
                         if (isLoading) {
                           return SliverFillRemaining(
                             child: CupertinoActivityIndicator(),
@@ -95,7 +113,7 @@ if (value.isLoading) {
                         }
                       },
                     );
-                  }
+                  },
                 ),
               ],
             ),
